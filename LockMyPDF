@@ -1,0 +1,56 @@
+from PyPDF2 import PdfReader, PdfWriter
+
+def lock_pdf(input_pdf, output_pdf, password):
+    """Locks a PDF file with a password"""
+    pdf_writer = PdfWriter()
+    pdf_reader = PdfReader(input_pdf)
+
+    for page in range(len(pdf_reader.pages)):
+        pdf_writer.add_page(pdf_reader.pages[page])
+
+    pdf_writer.encrypt(password)
+
+    with open(output_pdf, "wb") as output_file:
+        pdf_writer.write(output_file)
+
+    print(f"PDF Locked Successfully! Saved as: {output_pdf}")
+
+def unlock_pdf(input_pdf, output_pdf, password):
+    """Unlocks a password-protected PDF"""
+    pdf_reader = PdfReader(input_pdf)
+    
+    if pdf_reader.is_encrypted:
+        try:
+            pdf_reader.decrypt(password)
+        except:
+            print("Incorrect Password!")
+            return
+    
+    pdf_writer = PdfWriter()
+    
+    for page in range(len(pdf_reader.pages)):
+        pdf_writer.add_page(pdf_reader.pages[page])
+
+    with open(output_pdf, "wb") as output_file:
+        pdf_writer.write(output_file)
+
+    print(f"PDF Unlocked Successfully! Saved as: {output_pdf}")
+
+if __name__ == "__main__":
+    print("PDF Locker & Unlocker Tool")
+    choice = input("Do you want to (1) Lock or (2) Unlock a PDF? Enter 1 or 2: ")
+
+    if choice == "1":
+        input_file = input("Enter the PDF file path to lock: ")
+        output_file = input("Enter output file name: ")
+        password = input("Set a password: ")
+        lock_pdf(input_file, output_file, password)
+
+    elif choice == "2":
+        input_file = input("Enter the PDF file path to unlock: ")
+        output_file = input("Enter output file name: ")
+        password = input("Enter the PDF password: ")
+        unlock_pdf(input_file, output_file, password)
+
+    else:
+        print("Invalid choice! Please enter 1 or 2.")
